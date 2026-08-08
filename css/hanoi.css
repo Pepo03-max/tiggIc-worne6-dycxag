@@ -1,0 +1,27 @@
+.disks{
+  min-height:132px;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  width:100%;
+}
+.rod .disk{
+  background:var(--disk-color)!important;
+  color:var(--disk-text)!important;
+  font-weight:800;
+  box-shadow:0 2px 3px #10182835;
+}
+.rod .disk.picked{
+  outline:3px solid var(--accent);
+  outline-offset:2px;
+  transform:translateY(-3px);
+}
+.rod.goal{
+  border-color:var(--good);
+  background:#16a34a0d;
+}
+.rod.goal .rod-label{
+  color:var(--good);
+  font-weight:800;
+}

@@ -1,0 +1,42 @@
+.pattern-sequence{
+  align-items:center;
+  gap:4px;
+}
+.pattern-token{
+  min-width:48px;
+  min-height:52px;
+  display:grid;
+  place-items:center;
+  overflow:visible;
+}
+.pattern-symbol{
+  display:inline-block;
+  color:var(--pattern-color);
+  font-size:calc(26px * var(--pattern-size));
+  line-height:1;
+  white-space:nowrap;
+  transform:rotate(var(--pattern-rotate));
+}
+.pattern-sequence>.pattern-token,
+.pattern-sequence>.pattern-question{
+  min-width:32px;
+  min-height:42px;
+  padding:4px;
+}
+.pattern-sequence .pattern-symbol{
+  font-size:calc(17px * var(--pattern-size));
+}
+.pattern-option{
+  min-height:68px;
+}
+.pattern-option .pattern-symbol{
+  font-size:calc(30px * var(--pattern-size));
+}
+.pattern-question{
+  min-width:48px;
+  min-height:52px;
+  display:grid;
+  place-items:center;
+  font-size:28px;
+  font-weight:800;
+}

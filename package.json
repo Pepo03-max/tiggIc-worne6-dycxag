@@ -1,0 +1,7 @@
+{
+  "name": "mind-gym",
+  "private": true,
+  "scripts": {
+    "test": "node --test"
+  }
+}
