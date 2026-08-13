@@ -23,7 +23,8 @@ const App={
   load(){return MindGymStore.load()},
   save(){return MindGymStore.save(this.state)},
   st(id){return MindGymStore.game(this.state,id)},
-  level(id){const state=this.st(id);return state.manualLevel||U.clamp(1+Math.floor(state.bestStreak/3),1,5)},
+  levelFor(state){return state.manualLevel||U.clamp(1+Math.floor(state.bestStreak/3),1,5)},
+  level(id){return this.levelFor(this.st(id))},
 
   onCleanup(cleanup){
     if(this.active?.lifecycle)return this.active.lifecycle.add(cleanup);
@@ -188,7 +189,7 @@ const App={
 
   changeLevel(id,delta){
     const state=this.st(id);
-    state.manualLevel=U.clamp((state.manualLevel||this.level(id))+delta,1,5);
+    state.manualLevel=U.clamp(this.levelFor(state)+delta,1,5);
     this.save();
     this.play(id)
   },

@@ -69,3 +69,13 @@ button:focus-visible{outline:4px solid #efaa5f;outline-offset:3px}
 @media (max-width:380px){.odd-answers{gap:10px}.odd-answers .odd-choice{min-height:92px;padding:10px;font-size:44px}}
 
 .sheet .row{justify-content:center}
+
+.math-solution{margin:0;color:var(--bad);font-weight:750;min-height:1.45em}
+.math-actions{justify-content:center}
+.kakuro-actions{justify-content:center}
+.kakuro .kk-clue{gap:2px;padding:4px;line-height:1}
+.kakuro .kk-clue-arrow{color:var(--muted);font-size:15px;font-weight:500}
+.kakuro .kk-clue-sum{color:var(--ink);font-size:clamp(22px,6vw,32px);font-weight:850;letter-spacing:-.03em}
+.kakuro .valid{color:var(--good)!important;background:#16a34a22!important;box-shadow:inset 0 0 0 3px #23845466}
+.kakuro .wrong{color:var(--bad)!important;background:#dc262622!important;box-shadow:inset 0 0 0 3px #c7473d88}
+@media (max-width:380px){.kakuro .kk-clue-sum{font-size:24px}.kakuro .kk-clue-arrow{font-size:13px}}

@@ -30,6 +30,7 @@ test('cálculo mental y balanzas siempre ofrecen respuestas utilizables',()=>{
     const question=math.generateMentalMathQuestion(level);
     assert.ok(Number.isInteger(question.answer)&&question.answer>=0);
     assert.ok(question.text.length>0);
+    assert.ok(!question.text.includes('÷'));
     const scale=balance.generateBalanceQuestion(level),choices=balance.generateBalanceChoices(scale.answer);
     assert.equal(choices.length,4);
     assert.equal(new Set(choices).size,4);
@@ -52,6 +53,40 @@ test('Kakuro genera sumas correctas sin repetir dígitos en sus tramos',()=>{
       assert.equal(values.reduce((sum,value)=>sum+value,0),game.colClues[col])
     }
   }
+});
+
+test('Kakuro valida estados incompletos, errores y soluciones alternativas',()=>{
+  const{canCompleteKakuroRun,validateKakuro}=generator('kakuro.js',['canCompleteKakuroRun','validateKakuro'],32);
+  assert.equal(canCompleteKakuroRun([3,0],3),false);
+  assert.equal(canCompleteKakuroRun([1,0],3),true);
+  assert.equal(canCompleteKakuroRun([8,0],17),true);
+  assert.equal(canCompleteKakuroRun([4,4,0],12),false);
+  assert.equal(canCompleteKakuroRun([8,0],3),false);
+  assert.equal(canCompleteKakuroRun([1,0,0],4),false);
+  const rowClues=[3,7],colClues=[4,6];
+  const impossiblePartial=validateKakuro([[3,0],[2,1]],[3,3],[5,2]);
+  assert.equal(impossiblePartial.statuses[0][0],'invalid');
+  assert.equal(impossiblePartial.statuses[0][1],'empty');
+  const incomplete=validateKakuro([[1,0],[3,0]],rowClues,colClues);
+  assert.equal(incomplete.complete,false);
+  assert.equal(incomplete.hasErrors,false);
+  assert.deepEqual(incomplete.statuses,[['valid','empty'],['valid','empty']]);
+
+  const repeated=validateKakuro([[1,1],[3,4]],rowClues,colClues);
+  assert.equal(repeated.complete,true);
+  assert.equal(repeated.completeValid,false);
+  assert.equal(repeated.statuses[0][0],'invalid');
+  assert.equal(repeated.statuses[0][1],'invalid');
+  assert.equal(repeated.statuses[1][1],'invalid');
+
+  const exceeded=validateKakuro([[2,2],[3,4]],rowClues,colClues);
+  assert.equal(exceeded.hasErrors,true);
+  assert.equal(exceeded.statuses[0][0],'invalid');
+  assert.equal(exceeded.statuses[0][1],'invalid');
+
+  const alternative=validateKakuro([[4,1],[1,4]],[5,5],[5,5]);
+  assert.equal(alternative.completeValid,true);
+  assert.deepEqual(alternative.statuses,[['valid','valid'],['valid','valid']]);
 });
 
 test('los puzles deslizantes parten de una permutación válida y resoluble',()=>{
@@ -112,6 +147,28 @@ test('series y patrones producen respuestas y opciones únicas',()=>{
       assert.equal(patternChoices.length,4);
       assert.equal(new Set(patternChoices.map(patterns.patternTokenKey)).size,4);
       assert.ok(patternChoices.some(choice=>patterns.patternTokenKey(choice)===patterns.patternTokenKey(pattern.answer)))
+    }
+  }
+});
+
+test('los colores de patrones mantienen distancia visual suficiente',()=>{
+  const patterns=generator('patterns.js',[
+    'generatePattern','generatePatternChoices','patternTokenKey','selectPatternColors','patternColorDistance','PATTERN_MIN_COLOR_DISTANCE'
+  ],63);
+  for(let attempt=0;attempt<80;attempt++){
+    const colors=patterns.selectPatternColors(4);
+    assert.equal(new Set(colors).size,4);
+    for(let first=0;first<colors.length;first++)for(let second=first+1;second<colors.length;second++){
+      assert.ok(patterns.patternColorDistance(colors[first],colors[second])>=patterns.PATTERN_MIN_COLOR_DISTANCE)
+    }
+    const state={familyBags:{},lastFamilies:{},testHistory:{}},pattern=patterns.generatePattern((attempt%5)+1,state);
+    const used=[...new Set([...pattern.shown,pattern.answer].map(token=>token.color))];
+    for(let first=0;first<used.length;first++)for(let second=first+1;second<used.length;second++){
+      assert.ok(patterns.patternColorDistance(used[first],used[second])>=patterns.PATTERN_MIN_COLOR_DISTANCE)
+    }
+    const choices=patterns.generatePatternChoices(pattern.answer,pattern.focus),choiceColors=[...new Set(choices.map(token=>token.color))];
+    for(let first=0;first<choiceColors.length;first++)for(let second=first+1;second<choiceColors.length;second++){
+      assert.ok(patterns.patternColorDistance(choiceColors[first],choiceColors[second])>=patterns.PATTERN_MIN_COLOR_DISTANCE)
     }
   }
 });

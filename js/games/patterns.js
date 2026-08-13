@@ -7,10 +7,34 @@ const patternColorNames={
 };
 const patternSizes=[.78,1,1.25,1.5],patternSizeNames={'0.78':'pequeño','1':'mediano','1.25':'grande','1.5':'muy grande'};
 const patternRotations=[0,90,180,270],patternCounts=[1,2,3,4];
+const PATTERN_MIN_COLOR_DISTANCE=80;
+
+function patternColorRgb(color){return[1,3,5].map(index=>parseInt(color.slice(index,index+2),16))}
+function patternColorDistance(first,second){
+  const a=patternColorRgb(first),b=patternColorRgb(second);
+  return Math.hypot(...a.map((value,index)=>value-b[index]))
+}
+function selectPatternColors(count=4,required=[]){
+  const candidates=U.shuffle(DATA.pal),uniqueRequired=[...new Set(required)].filter(color=>candidates.includes(color));
+  const requiredAreSeparated=uniqueRequired.every((color,index)=>uniqueRequired.slice(index+1).every(other=>patternColorDistance(color,other)>=PATTERN_MIN_COLOR_DISTANCE));
+  const seed=requiredAreSeparated?uniqueRequired:[];
+  const target=Math.min(count,4);
+  const search=(chosen,start)=>{
+    if(chosen.length===target)return chosen;
+    for(let index=start;index<candidates.length;index++){
+      const color=candidates[index];
+      if(chosen.includes(color)||chosen.some(selected=>patternColorDistance(color,selected)<PATTERN_MIN_COLOR_DISTANCE))continue;
+      const result=search([...chosen,color],index+1);
+      if(result)return result
+    }
+    return null
+  };
+  return U.shuffle(search(seed,0)||search([],0)||candidates.slice(0,target))
+}
 
 function patternContext(){
-  const shapes=U.shuffle(patternShapes),colors=U.shuffle(DATA.pal);
-  const token=(shape=shapes[0],color=colors[0],count=1,size=1,rotate=0)=>({shape,color,count,size,rotate});
+  const shapes=U.shuffle(patternShapes),colors=selectPatternColors(4);
+  const token=(shape=shapes[0],color=colors[0],count=1,size=1,rotate=0)=>({shape,color,count,size,rotate,patternColors:colors});
   return{shapes,colors,token}
 }
 function periodicPattern(period,length,label,focus){
@@ -88,8 +112,8 @@ function generatePattern(level,state){
   return{...test,family,signature}
 }
 
-function generatePatternChoices(answer,focus){
-  const domains={shape:patternShapes,color:DATA.pal,count:patternCounts,size:patternSizes,rotate:patternRotations};
+function generatePatternChoices(answer,focus,colors=answer.patternColors||selectPatternColors(4,[answer.color])){
+  const domains={shape:patternShapes,color:colors,count:patternCounts,size:patternSizes,rotate:patternRotations};
   const wrong=[],seen=new Set([patternTokenKey(answer)]);
   for(const property of U.shuffle(focus)){
     for(const value of U.shuffle(domains[property].filter(value=>value!==answer[property]))){
@@ -131,7 +155,7 @@ App.register({
     for(let index=0;index<6;index++)progress.append(U.el('span'));
 
     function renderToken(tag,token,props={}){
-      return U.el(tag,{...props,class:`${props.class||''} pattern-token`.trim(),'aria-label':describePatternToken(token)},
+      return U.el(tag,{...props,class:`${props.class||''} pattern-token pattern-count-${token.count}`.trim(),'aria-label':describePatternToken(token)},
         U.el('span',{class:'pattern-symbol',style:`--pattern-color:${token.color};--pattern-size:${token.size};--pattern-rotate:${token.rotate}deg`},token.shape.repeat(token.count)))
     }
     function next(){
@@ -143,7 +167,10 @@ App.register({
       round++;
       note.textContent=`Ronda ${round}/6 · nivel ${family.tier}: ${label}`;
       [...progress.children].forEach((dot,index)=>dot.classList.toggle('done',index<round-1));
-      sequence.replaceChildren(...shown.map(token=>renderToken('span',token)),U.el('span',{class:'pattern-question'},'?'));
+      const last=shown.at(-1),tail=U.el('span',{class:'pattern-tail'},
+        renderToken('span',last),U.el('span',{class:'pattern-question'},'?')
+      );
+      sequence.replaceChildren(...shown.slice(0,-1).map(token=>renderToken('span',token)),tail);
       const buttons=choices.map(token=>renderToken('button',token,{class:'btn pattern-option',onclick:event=>{
         answers.querySelectorAll('button').forEach(button=>button.disabled=true);
         if(patternTokenKey(token)===patternTokenKey(answer)){

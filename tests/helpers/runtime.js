@@ -55,6 +55,25 @@ function fakeElement(tag,props={},...children){
   }
 }
 
+function interactiveElement(tag,props={},...children){
+  const classes=new Set((props.class||'').split(/\s+/).filter(Boolean));
+  const element={
+    tag,props,children:[],textContent:'',disabled:false,
+    classList:{
+      add(...names){names.forEach(name=>classes.add(name))},
+      remove(...names){names.forEach(name=>classes.delete(name))},
+      contains(name){return classes.has(name)},
+      toggle(name,force){const enabled=force===undefined?!classes.has(name):force;if(enabled)classes.add(name);else classes.delete(name);return enabled}
+    },
+    append(...nodes){this.children.push(...nodes)},
+    replaceChildren(...nodes){this.children=nodes},
+    addEventListener(){},
+    setAttribute(){}
+  };
+  element.append(...children);
+  return element
+}
+
 function elementText(element){
   if(element==null)return'';
   if(typeof element==='string'||typeof element==='number')return String(element);
@@ -71,4 +90,4 @@ function findElement(element,predicate){
   return null
 }
 
-module.exports={createU,elementText,fakeElement,findElement,loadClassic,loadClassicFiles,projectRoot};
+module.exports={createU,elementText,fakeElement,findElement,interactiveElement,loadClassic,loadClassicFiles,projectRoot};
