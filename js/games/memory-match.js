@@ -7,10 +7,13 @@ function generateMemoryMatch(level){
 }
 
 App.register({
-  id:'memory',cat:'memory',icon:'🃏',title:'Parejas de memoria',
+  id:'memory',cat:'memory',icon:'🃏',title:'Parejas de memoria',layout:'wide',
   run(root,L,t){
     const{cols,rows,pairs,deck}=generateMemoryMatch(L);
-    const grid=U.el('div',{class:'grid mm',style:`--n:${cols}`});
+    const grid=U.el('div',{
+      class:`grid mm memory-grid memory-rows-${rows}`,
+      style:`--n:${cols}`
+    });
     const note=U.el('p',{class:'center'},'Encuentra todas las parejas.');
     const open=[];
     let locked=false,found=0,moves=0;

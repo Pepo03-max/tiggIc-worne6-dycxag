@@ -21,7 +21,7 @@ function generateOrderingRound(level,state){
 }
 
 App.register({
-  id:'ordering',cat:'numbers',icon:'📋',title:'Sequence Ordering',
+  id:'ordering',cat:'numbers',icon:'📋',title:'Sequence Ordering',layout:'compact',
   run(root,L,t){
     let round=0,score=0,correct=[],shown=[],selected=[],count=0,attempted=false,revealed=false;
     const gameState=App.st('ordering');

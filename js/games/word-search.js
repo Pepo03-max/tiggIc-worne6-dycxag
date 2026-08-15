@@ -25,10 +25,13 @@ function generateWordSearch(level){
 }
 
 App.register({
-  id:'wordsearch',cat:'spatial',icon:'🔤',title:'Sopa de letras',
+  id:'wordsearch',cat:'spatial',icon:'🔤',title:'Sopa de letras',layout:'wide',
   run(root,L,t){
     const{size:N,grid,placed}=generateWordSearch(L);
-    const g=U.el('div',{class:'wordgrid',style:`grid-template-columns:repeat(${N},1fr);width:min(100%,520px)`}),wordList=U.el('div',{class:'word-list','aria-label':'Palabras por encontrar'},...placed.map(item=>{item.el=U.el('span',{class:'word-item'},item.word);return item.el}));
+    const g=U.el('div',{
+      class:`wordgrid word-search-grid word-search-size-${N}`,
+      style:`grid-template-columns:repeat(${N},minmax(0,1fr))`
+    }),wordList=U.el('div',{class:'word-list','aria-label':'Palabras por encontrar'},...placed.map(item=>{item.el=U.el('span',{class:'word-item'},item.word);return item.el}));
     root.append(wordList,g);
     const els=[];
     grid.forEach((row,r)=>row.forEach((v,c)=>{

@@ -20,7 +20,7 @@ function generateHanoi(level,state){
 }
 
 App.register({
-  id:'hanoi',cat:'spatial',icon:'🗼',title:'Torres de Hanói',
+  id:'hanoi',cat:'spatial',icon:'🗼',title:'Torres de Hanói',layout:'board',
   run(root,L,t){
     const gameState=App.st('hanoi');
     const{disks:N,minMoves:min,start,goal}=generateHanoi(L,gameState);

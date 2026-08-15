@@ -142,7 +142,7 @@ function describePatternToken(token){
 }
 
 App.register({
-  id:'patterns',cat:'spatial',icon:'🧠',title:'Reconocimiento de patrones',
+  id:'patterns',cat:'spatial',icon:'🧠',title:'Reconocimiento de patrones',layout:'compact',
   run(root,L,t){
     const state=App.st('patterns');
     state.familyBags??={};

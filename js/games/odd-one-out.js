@@ -37,7 +37,7 @@ function generateOddOneOut(level,state){
 }
 
 App.register({
-  id:'odd',cat:'numbers',icon:'🔍',title:'El elemento diferente',
+  id:'odd',cat:'numbers',icon:'🔍',title:'El elemento diferente',layout:'compact',
   run(root,L,t){
     const gameState=App.st('odd');
     gameState.categoryBags??={};

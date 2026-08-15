@@ -9,10 +9,10 @@ function generatePositionalMemory(level){
 }
 
 App.register({
-  id:'posmem',cat:'memory',icon:'📍',title:'Memoria de posiciones',
+  id:'posmem',cat:'memory',icon:'📍',title:'Memoria de posiciones',layout:'compact',
   run(root,L,t){
     const{side,count,spots,symbols,revealTime}=generatePositionalMemory(L);
-    const grid=U.el('div',{class:'grid',style:`grid-template-columns:repeat(${side},1fr)`});
+    const grid=U.el('div',{class:'grid positional-grid',style:`grid-template-columns:repeat(${side},1fr)`});
     const note=U.el('p',{class:'center'},`Memoriza ${count} posiciones…`);
     let recalling=false,found=0;
     root.append(note,grid);

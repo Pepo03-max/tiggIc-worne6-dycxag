@@ -95,7 +95,7 @@ function generateSudokuPuzzle(level,recent=[]){
 }
 
 App.register({
-  id:'sudoku',cat:'numbers',icon:'🔢',title:'Mini sudoku',
+  id:'sudoku',cat:'numbers',icon:'🔢',title:'Mini sudoku',layout:'board',
   run(root,L,t){
     const gameState=App.st('sudoku');
     gameState.puzzleHistory??={};

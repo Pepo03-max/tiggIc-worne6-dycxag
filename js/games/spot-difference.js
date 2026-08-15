@@ -8,7 +8,7 @@ function generateSpotDifference(level){
 }
 
 App.register({
-  id:'spotdiff',cat:'spatial',icon:'🕵️',title:'Spot the Difference',
+  id:'spotdiff',cat:'spatial',icon:'🕵️',title:'Spot the Difference',layout:'wide',
   run(root,L,t){
     const generated=generateSpotDifference(L);
     const{cols,rows,differences:n,left:base,right,differentIndexes:diff}=generated;

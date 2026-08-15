@@ -33,7 +33,7 @@ function generateBalanceChoices(correct){
 }
 
 App.register({
-  id:'balance',cat:'numbers',icon:'⚖️',title:'Number Balance',
+  id:'balance',cat:'numbers',icon:'⚖️',title:'Number Balance',layout:'compact',
   run(root,L,t){
     let round=0,score=0,answer,locked=false;
     const note=U.el('p',{class:'center'}),progress=U.el('div',{class:'progress'});

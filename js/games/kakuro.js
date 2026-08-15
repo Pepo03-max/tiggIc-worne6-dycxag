@@ -50,7 +50,7 @@ function validateKakuro(values,rowClues,colClues){
 }
 
 App.register({
-  id:'kakuro',cat:'numbers',icon:'🧮',title:'Kakuro',
+  id:'kakuro',cat:'numbers',icon:'🧮',title:'Kakuro',layout:'board',
   run(root,L,t){
     const{rows,cols,rowClues,colClues}=generateKakuro(L);
     const values=Array.from({length:rows},()=>Array(cols).fill(0));
@@ -59,7 +59,7 @@ App.register({
       class:'sd kakuro',
       style:`grid-template-columns:repeat(${cols+1},1fr);max-width:${Math.min(430,(cols+1)*68)}px;width:100%`
     });
-    const pad=U.el('div',{class:'pad'}),actions=U.el('div',{class:'row kakuro-actions'}),status=U.el('p',{class:'center'});
+    const pad=U.el('div',{class:'pad kakuro-pad'}),actions=U.el('div',{class:'row kakuro-actions'}),status=U.el('p',{class:'center'});
     let selected=null,wrong=0,done=false,lastCheckedSignature=null;
 
     status.textContent=`Kakuro ${rows}×${cols}: completa las sumas sin repetir dígitos en cada fila o columna.`;

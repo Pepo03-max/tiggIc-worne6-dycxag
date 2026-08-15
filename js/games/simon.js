@@ -4,10 +4,10 @@ function simonConfig(level){
 }
 
 App.register({
-  id:'simon',cat:'memory',icon:'🎨',title:'Simón de secuencias',
+  id:'simon',cat:'memory',icon:'🎨',title:'Simón de secuencias',layout:'compact',
   run(root,L,t){
     const{goal,colors}=simonConfig(L),sequence=[];
-    const pads=U.el('div',{class:'simon'}),note=U.el('p',{class:'center'},'Cuando estés listo, empieza la partida.');
+    const pads=U.el('div',{class:'simon',style:`--simon-columns:${colors.length}`}),note=U.el('p',{class:'center'},'Cuando estés listo, empieza la partida.');
     const startButton=U.el('button',{class:'btn primary',onclick:start},'Empezar partida');
     let round=0,index=0,accepting=false,started=false;
     root.append(note,startButton,pads);

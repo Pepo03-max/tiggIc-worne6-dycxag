@@ -54,7 +54,7 @@ function generateSequenceChoices(answer){
 }
 
 App.register({
-  id:'sequences',cat:'numbers',icon:'🔁',title:'Series numéricas',
+  id:'sequences',cat:'numbers',icon:'🔁',title:'Series numéricas',layout:'compact',
   run(root,L,t){
     let round=0,score=0;
     const sequence=U.el('div',{class:'sequence'}),options=U.el('div',{class:'answers'});

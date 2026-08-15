@@ -16,7 +16,7 @@ const App={
     wordsearch:'Encuentra las palabras ocultas deslizando sobre las letras.',
     spotdiff:'Toca las casillas que son distintas entre las dos imágenes.',
     sliding:'Desliza las piezas hasta ordenar los números.',
-    maze:'Arrastra desde la salida verde hasta la meta roja.'
+    maze:'Traza el camino desde la salida verde hasta la meta roja. Puedes levantar el dedo o soltar el ratón y continuar desde el extremo de la línea. Si pasan 5 segundos sin avanzar, el recorrido se borrará y tendrás que empezar de nuevo.'
   },
 
   register(game){this.games.push(game);this.byId[game.id]=game},
@@ -81,6 +81,10 @@ const App={
     const week=U.el('div',{class:'week'},...weekly.map(day=>U.el('div',{class:'week-day'},
       U.el('span',{class:day.done?'week-dot done':'week-dot'},day.done?'✓':''),U.el('small',{},day.label)
     )));
+    const activitySummary=U.el('div',{class:'activity-summary'},
+      U.el('span',{class:'activity-count'},`${weekly.filter(day=>day.done).length}/7`),
+      U.el('p',{class:'daily-goal'},todayCount>=5?'✓ Objetivo de hoy completado':`Hoy: ${todayCount} de 5 partidas`)
+    );
     this.root.append(
       U.el('header',{class:'home-hero'},
         U.el('img',{class:'brand-mark',src:'icons/icon.svg',alt:'Logotipo de Mind Gym'}),
@@ -94,16 +98,14 @@ const App={
       ),
       U.el('section',{class:'activity-card'},
         U.el('div',{class:'activity-title'},
-          U.el('div',{},U.el('strong',{},'Racha semanal'),U.el('small',{},'Completa 5 partidas para que cuente el día.')),
-          U.el('span',{class:'activity-count'},`${weekly.filter(day=>day.done).length}/7`)
+          U.el('div',{},U.el('strong',{},'Racha semanal'),U.el('small',{},'Completa 5 partidas para que cuente el día.'))
         ),
         week,
-        U.el('p',{class:'daily-goal'},todayCount>=5?'✓ Objetivo de hoy completado':`Hoy: ${todayCount} de 5 partidas`)
+        activitySummary
       )
     );
     if(recallButton)this.root.append(recallButton);
     for(const[label,category]of[['Memoria','memory'],['Números y lógica','numbers'],['Visual y espacial','spatial']]){
-      this.root.append(U.el('h2',{class:'cat'},label));
       const grid=U.el('div',{class:`cards cards-${category}`});
       for(const game of this.games.filter(item=>item.cat===category)){
         const state=this.st(game.id);
@@ -112,16 +114,21 @@ const App={
             U.el('span',{class:'card-icon'},game.icon),
             U.el('span',{class:'card-arrow','aria-hidden':'true'},'›')
           ),
-          U.el('div',{class:'card-title'},
-            U.el('b',{},game.title,game.id==='ordering'?U.el('span',{class:'trial-badge'},'En pruebas'):null),
-            U.el('small',{class:'card-desc'},benefits[category])
-          ),
-          U.el('div',{class:'card-meta'},
-            U.el('span',{},`Nivel ${this.level(game.id)}`),U.el('span',{},`${state.played} partidas`)
+          U.el('div',{class:'card-content'},
+            U.el('div',{class:'card-title'},
+              U.el('div',{class:`card-heading${game.id==='ordering'?' card-heading-badged':''}`},
+                U.el('b',{},game.title),
+                game.id==='ordering'?U.el('span',{class:'trial-badge'},'En pruebas'):null
+              ),
+              U.el('small',{class:'card-desc'},benefits[category])
+            ),
+            U.el('div',{class:'card-meta'},
+              U.el('span',{},`Nivel ${this.level(game.id)}`),U.el('span',{},`${state.played} partidas`)
+            )
           )
         ))
       }
-      this.root.append(grid)
+      this.root.append(U.el('section',{class:`category category-${category}`},U.el('h2',{class:'cat'},label),grid))
     }
     this.root.append(
       U.el('p',{class:'foot'},'El progreso se guarda solo en este dispositivo.'),
@@ -149,11 +156,30 @@ const App={
     const upper=U.el('button',{class:'level-btn',title:'Subir dificultad',onclick:()=>this.changeLevel(id,1)},'+');
     const help=U.el('button',{class:'level-btn',title:'Ver ayuda',onclick:()=>this.showHelp(game,id,token)},'?');
     const levelChip=U.el('span',{class:'chip'},'Nivel '+levelValue);
+    const difficulty=U.el('div',{class:'game-difficulty','aria-label':'Dificultad'},lower,levelChip,upper);
+    const gameNav=U.el('div',{class:'game-nav','aria-label':'Navegación del juego'},
+      U.el('button',{class:'link game-back',onclick:()=>this.home()},'‹ Volver'),
+      U.el('strong',{},game.icon+' '+game.title)
+    );
+    const gameStatus=U.el('div',{class:'game-status','aria-label':'Tiempo de la partida'},time);
+    const gameControls=U.el('div',{class:'game-controls','aria-label':'Nivel y controles del juego'},help,difficulty);
+    const gameHead=U.el('header',{class:'game-head'},gameNav,gameStatus,gameControls);
+    const gameAsideCopy=U.el('div',{class:'game-aside-copy'},
+      U.el('p',{class:'eyebrow'},'ESTÁS ENTRENANDO'),
+      U.el('h1',{},game.title),
+      U.el('p',{class:'game-description'},this.descriptions[id]||'Completa el reto siguiendo las indicaciones.'),
+      U.el('div',{class:'game-progress'},
+        U.el('p',{class:'eyebrow'},'PROGRESO'),
+        U.el('strong',{},`${state.played} partidas`),
+        U.el('small',{},`Racha actual: ${state.streak}`)
+      )
+    );
     this.root.append(
-      U.el('header',{class:'game-head'},
-        U.el('button',{class:'link',onclick:()=>this.home()},'‹ Volver'),
-        U.el('strong',{},game.icon+' '+game.title),help,lower,levelChip,upper,time
-      ),body
+      U.el('div',{class:`game-layout game-layout-${game.layout||'compact'}`},
+        gameHead,
+        U.el('section',{class:`game-main game-main-${game.layout||'compact'}`},body),
+        U.el('aside',{class:'game-aside'},gameAsideCopy)
+      )
     );
     const begin=()=>this.begin(game,body,levelValue,token,time);
     if(state.helpSeen)begin();

@@ -19,7 +19,7 @@ function generateSlidingPuzzle(level){
 }
 
 App.register({
-  id:'sliding',cat:'spatial',icon:'🧩',title:'Puzle deslizante',
+  id:'sliding',cat:'spatial',icon:'🧩',title:'Puzle deslizante',layout:'compact',
   run(root,L,t){
     const generated=generateSlidingPuzzle(L);
     const{size,total,board}=generated;

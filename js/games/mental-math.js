@@ -26,7 +26,7 @@ function evaluateMentalMathAnswer(entry,solution){
 }
 
 App.register({
-  id:'math',cat:'numbers',icon:'➗',title:'Mental Math',
+  id:'math',cat:'numbers',icon:'➗',title:'Mental Math',layout:'compact',
   run(root,L,t){
     let round=0,score=0,current,entry='',locked=false;
     const note=U.el('p',{class:'center'}),progress=U.el('div',{class:'progress'});
