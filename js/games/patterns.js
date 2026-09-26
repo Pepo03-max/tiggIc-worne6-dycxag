@@ -148,11 +148,16 @@ App.register({
     state.familyBags??={};
     state.lastFamilies??={};
     state.testHistory??={};
-    let round=0,score=0;
+    let round=0,score=0,currentLabel='',currentTier=0,waitingForAnswer=true;
     const note=U.el('p',{class:'center'}),progress=U.el('div',{class:'progress'});
     const sequence=U.el('div',{class:'sequence pattern-sequence'}),answers=U.el('div',{class:'answers'}),actions=U.el('div',{class:'row'});
     root.append(note,progress,sequence,answers,actions);
     for(let index=0;index<6;index++)progress.append(U.el('span'));
+
+    const updatePatternVisibility=()=>{
+      if(waitingForAnswer&&round)note.textContent=`Ronda ${round}/6 · nivel ${currentTier}${App.active.showPattern===true?`: ${currentLabel}`:''}`
+    };
+    App.active.updatePatternVisibility=updatePatternVisibility;
 
     function renderToken(tag,token,props={}){
       return U.el(tag,{...props,class:`${props.class||''} pattern-token pattern-count-${token.count}`.trim(),'aria-label':describePatternToken(token)},
@@ -165,7 +170,10 @@ App.register({
       const{shown,answer,label,focus,family}=generatePattern(L,state),choices=generatePatternChoices(answer,focus);
       App.save();
       round++;
-      note.textContent=`Ronda ${round}/6 · nivel ${family.tier}: ${label}`;
+      currentLabel=label;
+      currentTier=family.tier;
+      waitingForAnswer=true;
+      updatePatternVisibility();
       [...progress.children].forEach((dot,index)=>dot.classList.toggle('done',index<round-1));
       const last=shown.at(-1),tail=U.el('span',{class:'pattern-tail'},
         renderToken('span',last),U.el('span',{class:'pattern-question'},'?')
@@ -173,6 +181,7 @@ App.register({
       sequence.replaceChildren(...shown.slice(0,-1).map(token=>renderToken('span',token)),tail);
       const buttons=choices.map(token=>renderToken('button',token,{class:'btn pattern-option',onclick:event=>{
         answers.querySelectorAll('button').forEach(button=>button.disabled=true);
+        waitingForAnswer=false;
         if(patternTokenKey(token)===patternTokenKey(answer)){
           score++;
           event.currentTarget.classList.add('ok');

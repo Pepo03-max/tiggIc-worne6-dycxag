@@ -74,6 +74,11 @@ const App={
     this.clear();
     this.root.className='home-screen';
     this.active=null;
+    if(this.pendingServiceWorkerReload){
+      this.pendingServiceWorkerReload=false;
+      location.reload();
+      return
+    }
     const weekly=this.weeklyActivity();
     const todayCount=Math.min(5,(this.state.dailyPlayCounts||{})[this.today()]||0);
     const recallButton=this.state.recallEnabled===false?U.el('button',{class:'btn secondary',onclick:()=>this.showRecallWords()},'🧠 Activar reto de recuerdo'):null;
@@ -87,8 +92,8 @@ const App={
     );
     this.root.append(
       U.el('header',{class:'home-hero'},
-        U.el('img',{class:'brand-mark',src:'icons/icon.svg',alt:'Logotipo de Mind Gym'}),
-        U.el('div',{},U.el('h1',{},'Mind Gym'),U.el('p',{class:'sub'},'Un ratito para cuidar tu mente.'))
+        U.el('img',{class:'brand-mark',src:'icons/icon.svg',alt:'Logotipo de Mente Activa'}),
+        U.el('div',{},U.el('h1',{},'Mente Activa'),U.el('p',{class:'sub'},'Un ratito para cuidar tu mente.'))
       ),
       U.el('section',{class:'daily-card'},
         U.el('p',{class:'eyebrow'},'TU PROPUESTA DE HOY'),
@@ -143,14 +148,14 @@ const App={
     )
   },
 
-  play(id){
+  play(id,options={}){
     const game=this.byId[id];
     if(!game)return;
     this.clear();
     this.root.className='play-screen';
     const token=++this.session,levelValue=this.level(id);
     const time=U.el('span',{class:'chip'},'⏱ 0:00'),body=U.el('div',{class:'game-body'}),state=this.st(id);
-    this.active={id,L:levelValue,token,mistakes:0,over:false,started:false};
+    this.active={id,L:levelValue,token,mistakes:0,over:false,started:false,showPattern:options.showPattern===true};
     this.active.lifecycle=GameLifecycle.create(()=>this.active?.token===token&&!this.active.over);
     const lower=U.el('button',{class:'level-btn',title:'Bajar dificultad',onclick:()=>this.changeLevel(id,-1)},'−');
     const upper=U.el('button',{class:'level-btn',title:'Subir dificultad',onclick:()=>this.changeLevel(id,1)},'+');
@@ -204,9 +209,18 @@ const App={
       }
     };
     const testingNote=id==='ordering'?U.el('p',{class:'testing-note'},'🧪 Este juego todavía está en pruebas. Si ves un error o no estás de acuerdo con algún orden, apúntalo para poder corregirlo en una futura mejora.'):null;
+    const patternOption=['sequences','patterns'].includes(id)?U.el('label',{class:'help-toggle'},
+      U.el('input',{type:'checkbox',checked:this.active?.showPattern===true,onchange:event=>{
+        if(token!==this.active?.token)return;
+        this.active.showPattern=event.currentTarget.checked;
+        if(token===this.active?.token)this.active.updatePatternVisibility?.()
+      }}),
+      U.el('span',{},'Mostrar la regla de la ronda')
+    ):null;
     const modal=U.el('div',{class:'overlay'},U.el('section',{class:'sheet'},
       U.el('div',{class:'result'},game.icon),U.el('h2',{},game.title),
       U.el('p',{},this.descriptions[id]||'Completa el reto siguiendo las indicaciones.'),
+      patternOption,
       testingNote,
       U.el('button',{class:'btn primary',onclick:close},first?'Entendido, empezar':'Cerrar ayuda')
     ));
@@ -214,10 +228,11 @@ const App={
   },
 
   changeLevel(id,delta){
+    const showPattern=this.active?.id===id&&this.active.showPattern===true;
     const state=this.st(id);
     state.manualLevel=U.clamp(this.levelFor(state)+delta,1,5);
     this.save();
-    this.play(id)
+    this.play(id,{showPattern})
   },
   mistake(){if(this.active&&!this.active.over)this.active.mistakes++}
 };

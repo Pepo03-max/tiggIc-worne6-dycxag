@@ -1,4 +1,4 @@
-# 🧠 Mind Gym
+# 🧠 Mente Activa
 
 PWA offline de entrenamiento mental con 16 juegos, dificultad adaptativa y progreso local. No usa dependencias ni servidor.
 
@@ -23,7 +23,7 @@ La suite comprueba la unicidad de los sudokus, los invariantes de los generadore
 - `js/games/`: generadores y presentación de cada juego.
 - `tests/`: pruebas automatizadas permanentes.
 
-El progreso usa un esquema versionado. `MindGymStore` valida y migra automáticamente los datos antiguos antes de entregarlos a la aplicación.
+El progreso usa un esquema versionado. El módulo de almacenamiento valida y migra automáticamente los datos antes de entregarlos a la aplicación.
 
 ## Correcciones aplicadas
 

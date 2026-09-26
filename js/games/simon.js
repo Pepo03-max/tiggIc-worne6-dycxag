@@ -4,7 +4,7 @@ function simonConfig(level){
 }
 
 App.register({
-  id:'simon',cat:'memory',icon:'🎨',title:'Simón de secuencias',layout:'compact',
+  id:'simon',cat:'memory',icon:'🎨',title:'Repite la secuencia',layout:'compact',
   run(root,L,t){
     const{goal,colors}=simonConfig(L),sequence=[];
     const pads=U.el('div',{class:'simon',style:`--simon-columns:${colors.length}`}),note=U.el('p',{class:'center'},'Cuando estés listo, empieza la partida.');

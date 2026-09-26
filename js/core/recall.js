@@ -81,6 +81,12 @@ Object.assign(App,{
         if(renew)this.showRecallWords(after);
         else after()
       };
+      const repeatWords=()=>{
+        recall.games=0;
+        this.save();
+        modal.remove();
+        after()
+      };
       this.save();
       result.replaceChildren(
         U.el('div',{class:'result'},right.length===expected.length?'🎉':'📝'),
@@ -91,8 +97,11 @@ Object.assign(App,{
           ...wrong.map(word=>U.el('span',{class:'no'},word)),
           ...missed.map(word=>U.el('span',{class:'missed'},word))
         ),
-        U.el('p',{class:'small muted'},renew?'Ahora tendrás una lista nueva para las dos próximas partidas.':'Volveremos a preguntarte estas mismas palabras tras dos partidas más.'),
-        U.el('button',{class:'btn primary',onclick:continueAfter},renew?'Ver nuevas palabras':'Continuar')
+        U.el('p',{class:'small muted'},renew?'¿Quieres repetir estas palabras durante otras dos partidas o probar una lista nueva?':'Volveremos a preguntarte estas mismas palabras tras dos partidas más.'),
+        renew?U.el('div',{class:'grid'},
+          U.el('button',{class:'btn primary',onclick:repeatWords},'Seguir con estas palabras'),
+          U.el('button',{class:'btn',onclick:continueAfter},'Ver nuevas palabras')
+        ):U.el('button',{class:'btn primary',onclick:continueAfter},'Continuar')
       )
     };
     const result=U.el('section',{class:'sheet'},

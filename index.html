@@ -3,26 +3,51 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Mind Gym — Gimnasio mental</title>
+  <title>Mente Activa</title>
   <meta name="description" content="Entrenamiento mental diario: memoria, lógica, números y puzles espaciales.">
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#f4f6f8">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Mind Gym">
+  <meta name="apple-mobile-web-app-title" content="Mente Activa">
   <meta name="format-detection" content="telephone=no">
   <link rel="apple-touch-icon" href="icons/icon-180.png">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/style.css?v=53"><link rel="stylesheet" href="css/layout.css?v=10"><link rel="stylesheet" href="css/hanoi.css"><link rel="stylesheet" href="css/patterns.css?v=45">
+<link rel="stylesheet" href="css/style.css?v=54"><link rel="stylesheet" href="css/layout.css?v=10"><link rel="stylesheet" href="css/hanoi.css"><link rel="stylesheet" href="css/patterns.css?v=45">
 </head>
 <body><main id="app"></main>
-<script src="js/util.js"></script><script src="js/data.js"></script><script src="js/core/storage.js"></script><script src="js/core/lifecycle.js"></script><script src="js/app.js?v=53"></script><script src="js/core/recall.js"></script><script src="js/core/results.js"></script>
-<script src="js/games/memory-match.js?v=2"></script><script src="js/games/simon.js?v=2"></script><script src="js/games/positional-memory.js"></script>
+<script src="js/util.js"></script><script src="js/data.js"></script><script src="js/core/storage.js"></script><script src="js/core/lifecycle.js"></script><script src="js/app.js?v=56"></script><script src="js/core/recall.js"></script><script src="js/core/results.js"></script>
+<script src="js/games/memory-match.js?v=2"></script><script src="js/games/simon.js?v=3"></script><script src="js/games/positional-memory.js"></script>
 <script src="js/games/mental-math.js"></script><script src="js/games/sudoku.js"></script><script src="js/games/kakuro.js?v=2"></script>
 <script src="js/games/balance.js"></script><script src="js/games/odd-one-out.js?v=38"></script><script src="js/games/ordering.js"></script>
-<script src="js/games/sequences.js"></script><script src="js/games/hanoi.js"></script><script src="js/games/patterns.js?v=44"></script>
+<script src="js/games/sequences.js"></script><script src="js/games/hanoi.js"></script><script src="js/games/patterns.js?v=45"></script>
 <script src="js/games/word-search.js?v=2"></script><script src="js/games/spot-difference.js"></script><script src="js/games/sliding.js"></script><script src="js/games/maze.js?v=53"></script>
 <script src="js/locales/es.js"></script>
-<script>App.start(); if ('serviceWorker' in navigator && location.protocol !== 'file:') addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=53',{updateViaCache:'none'}).catch(()=>{}));</script>
+<script>
+App.start();
+if('serviceWorker'in navigator&&location.protocol!=='file:'){
+  let registration=null,controller=navigator.serviceWorker.controller,reloading=false;
+  const checkForUpdate=()=>{if(registration)registration.update().catch(()=>{})};
+  const reloadForUpdate=()=>{
+    if(reloading)return;
+    if(App.active){App.pendingServiceWorkerReload=true;return}
+    reloading=true;
+    location.reload()
+  };
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    const nextController=navigator.serviceWorker.controller;
+    if(!controller){controller=nextController;return}
+    if(nextController===controller)return;
+    controller=nextController;
+    reloadForUpdate()
+  });
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')checkForUpdate()
+  });
+  addEventListener('load',()=>navigator.serviceWorker.register('sw.js?v=57',{updateViaCache:'none'})
+    .then(value=>{registration=value;checkForUpdate()})
+    .catch(()=>{}),{once:true})
+}
+</script>
 </body></html>

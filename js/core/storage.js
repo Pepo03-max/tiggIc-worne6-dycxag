@@ -35,6 +35,7 @@ const MindGymStore={
       else if(key==='manualLevel')game[key]=this.int(game[key],defaultValue,0,5);
       else game[key]=this.int(game[key],defaultValue)
     }
+    delete game.showPattern;
     return game
   },
 

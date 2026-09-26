@@ -51,6 +51,8 @@ button:focus-visible{outline:4px solid #efaa5f;outline-offset:3px}
 @media (max-width:380px){.odd-answers{gap:10px}.odd-answers .odd-choice{min-height:92px;padding:10px;font-size:44px}}
 
 .sheet .row{justify-content:center}
+.help-toggle{display:flex;align-items:center;gap:10px;margin:18px 0;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#f8f6f1;text-align:left;font-weight:650}
+.help-toggle input{width:20px;height:20px;accent-color:var(--accent);flex:0 0 auto}
 
 .math-solution{margin:0;color:var(--bad);font-weight:750;min-height:1.45em}
 .math-actions{justify-content:center}

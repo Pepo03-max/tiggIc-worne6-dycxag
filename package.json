@@ -1,5 +1,5 @@
 {
-  "name": "mind-gym",
+  "name": "mente-activa",
   "private": true,
   "scripts": {
     "test": "node --test"

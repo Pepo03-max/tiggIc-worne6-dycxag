@@ -1,4 +1,4 @@
-const CACHE='mindgym-v53';
+const CACHE='menteactiva-v57';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./css/style.css','./css/layout.css','./css/hanoi.css','./css/patterns.css','./js/util.js','./js/data.js','./js/core/storage.js','./js/core/lifecycle.js','./js/app.js','./js/core/recall.js','./js/core/results.js',
  './js/games/memory-match.js','./js/games/simon.js','./js/games/positional-memory.js','./js/games/mental-math.js','./js/games/sudoku.js','./js/games/kakuro.js','./js/games/balance.js','./js/games/odd-one-out.js','./js/games/ordering.js','./js/games/sequences.js','./js/games/hanoi.js','./js/games/patterns.js','./js/games/word-search.js','./js/games/spot-difference.js','./js/games/sliding.js','./js/games/maze.js','./js/locales/es.js','./icons/icon.svg','./icons/icon-180.png','./icons/icon-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));

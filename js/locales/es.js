@@ -1,6 +1,6 @@
 const titlesEs={
   memory:'Parejas de memoria',
-  simon:'Simon dice',
+  simon:'Repite la secuencia',
   posmem:'Memoria de posiciones',
   math:'Cálculo mental',
   sudoku:'Mini sudoku',

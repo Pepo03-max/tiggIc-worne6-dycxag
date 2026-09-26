@@ -56,12 +56,16 @@ function generateSequenceChoices(answer){
 App.register({
   id:'sequences',cat:'numbers',icon:'🔁',title:'Series numéricas',layout:'compact',
   run(root,L,t){
-    let round=0,score=0;
+    let round=0,score=0,currentLabel='',waitingForAnswer=true;
     const sequence=U.el('div',{class:'sequence'}),options=U.el('div',{class:'answers'});
     const note=U.el('p',{class:'center'}),actions=U.el('div',{class:'row'});
     const state=App.st('sequences');
     state.testHistory??={};
     state.lastFamilies??={};
+    const updatePatternVisibility=()=>{
+      if(waitingForAnswer&&round)note.textContent=`Ronda ${round}/6${App.active.showPattern===true?` · ${currentLabel}`:''}`
+    };
+    App.active.updatePatternVisibility=updatePatternVisibility;
     root.append(note,sequence,options,actions);
 
     function next(){
@@ -71,10 +75,13 @@ App.register({
       const{values,answer,label}=generateSequence(L,state),choices=generateSequenceChoices(answer);
       App.save();
       round++;
-      note.textContent=`Ronda ${round}/6 · ${label}`;
+      currentLabel=label;
+      waitingForAnswer=true;
+      updatePatternVisibility();
       sequence.replaceChildren(...values.map(value=>U.el('span',{},value)),U.el('span',{},'?'));
       options.replaceChildren(...choices.map(value=>U.el('button',{class:'btn',onclick:event=>{
         options.querySelectorAll('button').forEach(button=>button.disabled=true);
+        waitingForAnswer=false;
         if(value===answer){
           score+=25;
           event.currentTarget.classList.add('ok');
