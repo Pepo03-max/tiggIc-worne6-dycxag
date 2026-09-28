@@ -21,6 +21,15 @@ function gameState(overrides={}){
   return{played:0,streak:0,bestStreak:0,bestScore:0,bestTime:0,totalScore:0,manualLevel:0,helpSeen:true,...overrides}
 }
 
+test('el recuerdo acepta líneas, comas, puntos y punto y coma',()=>{
+  const{App,getOverlay}=resultRuntime();
+  assert.deepEqual(Array.from(App.parseRecallWords('Árbol. sol, mar;\nluna\rNUBE. árbol')),['ARBOL','SOL','MAR','LUNA','NUBE']);
+  App.state={recall:{words:['ÁRBOL'],count:1,games:2,checks:0}};
+  App.showRecallPrompt(()=>{});
+  assert.match(elementText(getOverlay()),/una por línea o separadas por comas o puntos/);
+  assert.match(findElement(getOverlay(),element=>element.tag==='textarea').props.placeholder,/comas o puntos/)
+});
+
 test('las puntuaciones negativas no reducen el total',()=>{
   const{App}=resultRuntime();
   App.state={game:gameState({totalScore:25})};

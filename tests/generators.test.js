@@ -166,9 +166,42 @@ test('los colores de patrones mantienen distancia visual suficiente',()=>{
     for(let first=0;first<used.length;first++)for(let second=first+1;second<used.length;second++){
       assert.ok(patterns.patternColorDistance(used[first],used[second])>=patterns.PATTERN_MIN_COLOR_DISTANCE)
     }
-    const choices=patterns.generatePatternChoices(pattern.answer,pattern.focus),choiceColors=[...new Set(choices.map(token=>token.color))];
-    for(let first=0;first<choiceColors.length;first++)for(let second=first+1;second<choiceColors.length;second++){
-      assert.ok(patterns.patternColorDistance(choiceColors[first],choiceColors[second])>=patterns.PATTERN_MIN_COLOR_DISTANCE)
+    const choices=patterns.generatePatternChoices(pattern.answer,pattern.focus);
+    const visibleColors=[...new Set([...pattern.shown,...choices].map(token=>token.color))];
+    for(let first=0;first<visibleColors.length;first++)for(let second=first+1;second<visibleColors.length;second++){
+      assert.ok(patterns.patternColorDistance(visibleColors[first],visibleColors[second])>=patterns.PATTERN_MIN_COLOR_DISTANCE)
+    }
+  }
+});
+
+test('la paleta de patrones conserva separación con deficiencias de visión cromática simuladas',()=>{
+  const{selectPatternColors}=generator('patterns.js',['selectPatternColors'],64);
+  const colors=selectPatternColors();
+  const matrices=[
+    [[.152286,1.052583,-.204868],[.114503,.786281,.099216],[-.003882,-.048116,1.051998]],
+    [[.367322,.860646,-.227968],[.280085,.672501,.047413],[-.01182,.04294,.968881]],
+    [[1.255528,-.076749,-.178779],[-.078411,.930809,.147602],[.004733,.691367,.3039]]
+  ];
+  const linear=color=>[1,3,5].map(index=>parseInt(color.slice(index,index+2),16)/255)
+    .map(value=>value<=.04045?value/12.92:((value+.055)/1.055)**2.4);
+  const luminance=color=>linear(color).reduce((sum,value,index)=>sum+value*[.2126,.7152,.0722][index],0);
+  for(const color of colors){
+    assert.ok((luminance('#fffdfa')+.05)/(luminance(color)+.05)>=3,`${color} tiene poco contraste con el fondo`)
+  }
+  const oklab=rgb=>{
+    const l=Math.cbrt(.4122214708*rgb[0]+.5363325363*rgb[1]+.0514459929*rgb[2]);
+    const m=Math.cbrt(.2119034982*rgb[0]+.6806995451*rgb[1]+.1073969566*rgb[2]);
+    const s=Math.cbrt(.0883024619*rgb[0]+.2817188376*rgb[1]+.6299787005*rgb[2]);
+    return[.2104542553*l+.793617785*m-.0040720468*s,1.9779984951*l-2.428592205*m+.4505937099*s,.0259040371*l+.7827717662*m-.808675766*s]
+  };
+  const simulated=(color,matrix)=>{
+    const rgb=linear(color);
+    return oklab(matrix.map(row=>row.reduce((sum,value,index)=>sum+value*rgb[index],0)))
+  };
+  for(let first=0;first<colors.length;first++)for(let second=first+1;second<colors.length;second++){
+    for(const matrix of matrices){
+      const a=simulated(colors[first],matrix),b=simulated(colors[second],matrix);
+      assert.ok(Math.hypot(...a.map((value,index)=>value-b[index]))>=.1,`${colors[first]} y ${colors[second]} se parecen demasiado`)
     }
   }
 });

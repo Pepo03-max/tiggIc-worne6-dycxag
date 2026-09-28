@@ -62,14 +62,18 @@ Object.assign(App,{
     return text.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().trim()
   },
 
+  parseRecallWords(text){
+    return[...new Set(text.split(/[\r\n,;.]+/).map(word=>this.normalizeRecall(word)).filter(Boolean))]
+  },
+
   showRecallPrompt(after){
     const recall=this.recall();
     const input=U.el('textarea',{
-      class:'recall-input',placeholder:'Escribe una palabra por línea o sepáralas con comas',
+      class:'recall-input',placeholder:'Una palabra por línea o separadas por comas o puntos',
       rows:6,autocapitalize:'characters',spellcheck:false
     });
     const submit=()=>{
-      const written=[...new Set(input.value.split(/[\n,;]+/).map(word=>this.normalizeRecall(word)).filter(Boolean))];
+      const written=this.parseRecallWords(input.value);
       const expected=recall.words.map(word=>this.normalizeRecall(word));
       const right=expected.filter(word=>written.includes(word));
       const wrong=written.filter(word=>!expected.includes(word));
@@ -107,7 +111,7 @@ Object.assign(App,{
     const result=U.el('section',{class:'sheet'},
       U.el('div',{class:'result'},'✍️'),
       U.el('h2',{},'¿Qué palabras recuerdas?'),
-      U.el('p',{},'Escribe todas las que recuerdes, sin mirar la lista.'),
+      U.el('p',{},'Escribe todas las que recuerdes, una por línea o separadas por comas o puntos.'),
       input,
       U.el('button',{class:'btn primary',onclick:submit},'Comprobar')
     );

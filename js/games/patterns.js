@@ -2,38 +2,25 @@ const patternShapes=['●','▲','■','◆','★','♥'];
 const patternShapeNames={'●':'círculo','▲':'triángulo','■':'cuadrado','◆':'rombo','★':'estrella','♥':'corazón'};
 const patternShapePlurals={'●':'círculos','▲':'triángulos','■':'cuadrados','◆':'rombos','★':'estrellas','♥':'corazones'};
 const patternColorNames={
-  '#e74c3c':'rojo','#3498db':'azul','#2ecc71':'verde','#f1c40f':'amarillo',
-  '#9b59b6':'morado','#e67e22':'naranja','#1abc9c':'turquesa','#e84393':'rosa'
+  '#3899ca':'azul claro','#c66200':'naranja','#7442a0':'morado','#454545':'gris oscuro'
 };
 const patternSizes=[.78,1,1.25,1.5],patternSizeNames={'0.78':'pequeño','1':'mediano','1.25':'grande','1.5':'muy grande'};
 const patternRotations=[0,90,180,270],patternCounts=[1,2,3,4];
-const PATTERN_MIN_COLOR_DISTANCE=80;
+// La paleta separa también los tonos en simulaciones de protanopia, deuteranopia y tritanopia.
+const patternPalette=Object.keys(patternColorNames);
+const PATTERN_MIN_COLOR_DISTANCE=100;
 
 function patternColorRgb(color){return[1,3,5].map(index=>parseInt(color.slice(index,index+2),16))}
 function patternColorDistance(first,second){
   const a=patternColorRgb(first),b=patternColorRgb(second);
   return Math.hypot(...a.map((value,index)=>value-b[index]))
 }
-function selectPatternColors(count=4,required=[]){
-  const candidates=U.shuffle(DATA.pal),uniqueRequired=[...new Set(required)].filter(color=>candidates.includes(color));
-  const requiredAreSeparated=uniqueRequired.every((color,index)=>uniqueRequired.slice(index+1).every(other=>patternColorDistance(color,other)>=PATTERN_MIN_COLOR_DISTANCE));
-  const seed=requiredAreSeparated?uniqueRequired:[];
-  const target=Math.min(count,4);
-  const search=(chosen,start)=>{
-    if(chosen.length===target)return chosen;
-    for(let index=start;index<candidates.length;index++){
-      const color=candidates[index];
-      if(chosen.includes(color)||chosen.some(selected=>patternColorDistance(color,selected)<PATTERN_MIN_COLOR_DISTANCE))continue;
-      const result=search([...chosen,color],index+1);
-      if(result)return result
-    }
-    return null
-  };
-  return U.shuffle(search(seed,0)||search([],0)||candidates.slice(0,target))
+function selectPatternColors(){
+  return U.shuffle(patternPalette)
 }
 
 function patternContext(){
-  const shapes=U.shuffle(patternShapes),colors=selectPatternColors(4);
+  const shapes=U.shuffle(patternShapes),colors=selectPatternColors();
   const token=(shape=shapes[0],color=colors[0],count=1,size=1,rotate=0)=>({shape,color,count,size,rotate,patternColors:colors});
   return{shapes,colors,token}
 }
@@ -112,7 +99,7 @@ function generatePattern(level,state){
   return{...test,family,signature}
 }
 
-function generatePatternChoices(answer,focus,colors=answer.patternColors||selectPatternColors(4,[answer.color])){
+function generatePatternChoices(answer,focus,colors=answer.patternColors||selectPatternColors()){
   const domains={shape:patternShapes,color:colors,count:patternCounts,size:patternSizes,rotate:patternRotations};
   const wrong=[],seen=new Set([patternTokenKey(answer)]);
   for(const property of U.shuffle(focus)){
